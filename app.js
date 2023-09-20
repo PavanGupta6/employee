@@ -39,10 +39,10 @@ const createEmployee = async (event) => {
     const response = { statusCode: 200 };
     try {
         const body = JSON.parse(event.body);
-        if(body.employeeId === undefined || body.employeeId === null || body.employeeId.length <= 4 ){
+        if(body.employeeId === undefined || body.employeeId === null || body.employeeId.length < 3 ){
             throw new Error("Employee Id must be at least 4 characters!! ");
         }
-        if(body.salary == undefined || body.salary == null || body.salary.length <= 6 ){
+        if(body.salary == undefined || body.salary == null || body.salary.length < 5 ){
             throw new Error("Employee salary must be at least 6 characters!! ");
         }
         const params = {
