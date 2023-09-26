@@ -75,7 +75,7 @@ const updateEmployee = async (event) => {
         const params = {
             TableName: process.env.DYNAMODB_TABLE_NAME,
             Key: marshall({ employeeId: event.pathParameters.employeeId }),
-            UpdateExpression: `SET ${objKeys.map((_, index) => `#key${index} = :value${index}`).join(", ")}`,
+            UpdateExpression: "SET " + objKeys.map((_, index) => `#key${index} = :value${index}`).join(", ")            ,
             ExpressionAttributeNames: objKeys.reduce((acc, key, index) => ({
                 ...acc,
                 [`#key${index}`]: key,
