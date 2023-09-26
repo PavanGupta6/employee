@@ -75,7 +75,7 @@ functions:
         Resource: !GetAtt EmployeeTable.Arn
 
   getAllEmployees:
-    handler: app.getAllemployees
+    handler: app.getAllEmployees
     name: get-all-employees
     memorySize: 128 # mb
     timeout: 5 # seconds
