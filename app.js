@@ -21,7 +21,7 @@ const getEmployee = async (event) => {
         response.body = JSON.stringify({
             message: "Successfully retrieved employee.",
             data: (Item) ? unmarshall(Item) : {},
-            rawData: Item,
+            // rawData: Item,
         });
     } catch (e) {
         console.error(e);
@@ -133,7 +133,7 @@ const getAllEmployees = async () => {
         response.body = JSON.stringify({
             message: "Successfully retrieved all employees.",
             data: Items.map((item) => unmarshall(item)),
-            Items,
+            // Items,
         });
     } catch (e) {
         console.error(e);
