@@ -1,29 +1,37 @@
 const {
     GetItemCommand,
     DynamoDBClient,
-    PutItemCommand,
-    DeleteItemCommand,
     ScanCommand,
-    UpdateItemCommand,
-  } = require('@aws-sdk/client-dynamodb');
-const db = new DynamoDBClient();
-const { marshall, unmarshall } = require ('@aws-sdk/util-dynamodb');
+  } = require('@aws-sdk/client-dynamodb'); //import functions from client-dynamodb library
+const db = new DynamoDBClient(); //create new instance of DynamoDBClient
+const { marshall, unmarshall } = require ('@aws-sdk/util-dynamodb'); //import util-dynamodb
 
-const getEmployee = async (event) => {
-    const response = { statusCode: 200 };
-    try {
+const getEmployee = async (event) => {          //create function as async with event as argument
+    const response = { statusCode: 200 };       //initialize status code 200 OK
+ /*    if(role == "EMPLOYEE"){
+        const {item } = await db.send(new GetItemCommand(params));
+        if(empId != item.empId){
+            throw new Error("Access denied!");
+        }
+    } */
+    //try block code
+    try { 
+        // define tablename and employeeId key with its value
         const params = {
             TableName: process.env.DYNAMODB_TABLE_NAME,
-            Key: marshall({ employeeId: event.pathParameters.employeeId }),
+            Key: marshall({ empId: event.pathParameters.empId }),
         };
+        //await response from db when sent getItem command with params containing tablename and key
         const { Item } = await db.send(new GetItemCommand(params));
         console.log({ Item });
+        // generate response message and body
         response.body = JSON.stringify({
             message: "Successfully retrieved employee.",
             data: (Item) ? unmarshall(Item) : {},
             // rawData: Item,
         });
-    } catch (e) {
+    } // catch block to handle any errors
+    catch (e) {
         console.error(e);
         response.statusCode = 500;
         response.body = JSON.stringify({
@@ -32,110 +40,32 @@ const getEmployee = async (event) => {
             errorStack: e.stack,
         });
     }
+    //return response with status 500 if any error occured, or with status 200 and data. 
     return response;
 };
 
-const createEmployee = async (event) => {
+//create getAllEmployees function as async with event as argument
+const getAllEmployees = async () => { 
+     //initialize status code 200 OK
     const response = { statusCode: 200 };
+/* let adminRole = "ADMIN";
+    let hrRole = "HR";
+    if(role != adminRole || role != hrRole){
+        throw new Error("User does not have access!");
+    } */
+    //try block code
     try {
-        const body = JSON.parse(event.body);
-        if(body.employeeId === undefined || body.employeeId === null || body.employeeId.length < 3 ){
-            throw new Error("Employee Id must be at least 4 characters!! ");
-        }
-        if(body.salary == undefined || body.salary == null || body.salary.length < 5 ){
-            throw new Error("Employee salary must be at least 6 characters!! ");
-        }
-        const params = {
-            TableName: process.env.DYNAMODB_TABLE_NAME,
-            Item: marshall(body || {}),
-        };
-
-        const createResult = await db.send(new PutItemCommand(params));
-        response.body = JSON.stringify({
-            message: "Successfully created employee.",
-            createResult,
-        });
-    } catch (e) {
-        console.error(e);
-        response.statusCode = 500;
-        response.body = JSON.stringify({
-            message: "Failed to create employee.",
-            errorMsg: e.message,
-            errorStack: e.stack,
-        });
-    }
-    return response;
-};
-
-const updateEmployee = async (event) => {
-    const response = { statusCode: 200 };
-    try {
-        const body = JSON.parse(event.body);
-        const objKeys = Object.keys(body);
-        const params = {
-            TableName: process.env.DYNAMODB_TABLE_NAME,
-            Key: marshall({ employeeId: event.pathParameters.employeeId }),
-            UpdateExpression: "SET " + objKeys.map((_, index) => `#key${index} = :value${index}`).join(", ")            ,
-            ExpressionAttributeNames: objKeys.reduce((acc, key, index) => ({
-                ...acc,
-                [`#key${index}`]: key,
-            }), {}),
-            ExpressionAttributeValues: marshall(objKeys.reduce((acc, key, index) => ({
-                ...acc,
-                [`:value${index}`]: body[key],
-            }), {})),
-        };
-        const updateResult = await db.send(new UpdateItemCommand(params));
-        response.body = JSON.stringify({
-            message: "Successfully updated employee.",
-            updateResult,
-        });
-    } catch (e) {
-        console.error(e);
-        response.statusCode = 500;
-        response.body = JSON.stringify({
-            message: "Failed to update employee.",
-            errorMsg: e.message,
-            errorStack: e.stack,
-        });
-    }
-    return response;
-};
-
-const deleteEmployee = async (event) => {
-    const response = { statusCode: 200 };
-    try {
-        const params = {
-            TableName: process.env.DYNAMODB_TABLE_NAME,
-            Key: marshall({ employeeId: event.pathParameters.employeeId }),
-        };
-        const deleteResult = await db.send(new DeleteItemCommand(params));
-        response.body = JSON.stringify({
-            message: "Successfully deleted employee.",
-            deleteResult,
-        });
-    } catch (e) {
-        console.error(e);
-        response.statusCode = 500;
-        response.body = JSON.stringify({
-            message: "Failed to delete employee.",
-            errorMsg: e.message,
-            errorStack: e.stack,
-        });
-    }
-    return response;
-};
-
-const getAllEmployees = async () => {
-    const response = { statusCode: 200 };
-    try {
+        //await response from db when sent scan command with tablename
         const { Items } = await db.send(new ScanCommand({ TableName: process.env.DYNAMODB_TABLE_NAME }));
+        // generate response message and body
         response.body = JSON.stringify({
             message: "Successfully retrieved all employees.",
             data: Items.map((item) => unmarshall(item)),
             // Items,
         });
-    } catch (e) {
+    } 
+    // catch block to handle any errors
+    catch (e) {
         console.error(e);
         response.statusCode = 500;
         response.body = JSON.stringify({
@@ -144,12 +74,12 @@ const getAllEmployees = async () => {
             errorStack: e.stack,
         });
     }
+    //return response with status 500 if any error occured, or with status 200 and data. 
     return response;
 };
+
+//export functions so that it can be used elsewhere
 module.exports = {
     getEmployee,
-    createEmployee,
-    updateEmployee,
-    deleteEmployee,
     getAllEmployees,
 };
