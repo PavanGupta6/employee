@@ -23,7 +23,6 @@ const getEmployee = async (event) => {          //create function as async with 
         };
         //await response from db when sent getItem command with params containing tablename and key
         const { Item } = await db.send(new GetItemCommand(params));
-        console.log({ Item });
         // generate response message and body
         response.body = JSON.stringify({
             message: "Successfully retrieved employee.",
@@ -60,7 +59,7 @@ const getAllEmployees = async () => {
         // generate response message and body
         response.body = JSON.stringify({
             message: "Successfully retrieved all employees.",
-            data: Items.map((item) => unmarshall(item)),
+            data: Items.map((item) => unmarshall(item.personalInfo)),
             // Items,
         });
     } 
