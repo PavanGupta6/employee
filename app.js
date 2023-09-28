@@ -54,12 +54,16 @@ const getAllEmployees = async () => {
     } */
     //try block code
     try {
+        const input = {
+            TableName: process.env.DYNAMODB_TABLE_NAME, // required
+            ProjectionExpression: "empId, personalInfo" // specify the attributes you want
+          };
         //await response from db when sent scan command with tablename
-        const { Items } = await db.send(new ScanCommand({ TableName: process.env.DYNAMODB_TABLE_NAME }));
+        const { Items } = await db.send(new ScanCommand(input));
         // generate response message and body
         response.body = JSON.stringify({
             message: "Successfully retrieved all employees.",
-            data: Items.map((item) => unmarshall(item.personalInfo)),
+            data: Items.map((item) => unmarshall(item)),
             // Items,
         });
     } 
