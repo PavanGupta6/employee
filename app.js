@@ -3,11 +3,14 @@ const {
     DynamoDBClient,
     ScanCommand,
   } = require('@aws-sdk/client-dynamodb'); //import functions from client-dynamodb library
-const db = new DynamoDBClient(); //create new instance of DynamoDBClient
-const { marshall, unmarshall } = require ('@aws-sdk/util-dynamodb'); //import util-dynamodb
-
-const getEmployee = async (event) => {          //create function as async with event as argument
-    const response = { statusCode: 200 };       //initialize status code 200 OK
+  //create new instance of DynamoDBClient
+const db = new DynamoDBClient(); 
+//import util-dynamodb
+const { marshall, unmarshall } = require ('@aws-sdk/util-dynamodb'); 
+//create function as async with event as argument
+const getEmployee = async (event) => {
+    //initialize status code 200 OK 
+    const response = { statusCode: 200 };       
  /*    if(role == "EMPLOYEE"){
         const {item } = await db.send(new GetItemCommand(params));
         if(empId != item.empId){
@@ -20,8 +23,10 @@ const getEmployee = async (event) => {          //create function as async with 
         const params = {
             TableName: process.env.DYNAMODB_TABLE_NAME,
             Key: marshall({ empId: event.pathParameters.empId }),
+            ProjectionExpression: "empId, personalInfo",
         };
-        //await response from db when sent getItem command with params containing tablename and key
+        //await response from db when sent getItem command with params 
+        //containing tablename, key and only display empId and personalInfo
         const { Item } = await db.send(new GetItemCommand(params));
         // generate response message and body
         response.body = JSON.stringify({
