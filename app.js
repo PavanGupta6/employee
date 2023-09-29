@@ -23,7 +23,6 @@ const getEmployee = async (event) => {
         const params = {
             TableName: process.env.DYNAMODB_TABLE_NAME,
             Key: marshall({ empId: event.pathParameters.empId }),
-            ProjectionExpression: "empId, personalInfo",
         };
         //await response from db when sent getItem command with params 
         //containing tablename, key and only display empId and personalInfo
@@ -60,8 +59,7 @@ const getAllEmployees = async () => {
     //try block code
     try {
         const input = {
-            TableName: process.env.DYNAMODB_TABLE_NAME, // required
-            ProjectionExpression: "empId, personalInfo" // specify the attributes you want
+            TableName: process.env.DYNAMODB_TABLE_NAME,
           };
         //await response from db when sent scan command with tablename
         const { Items } = await db.send(new ScanCommand(input));
