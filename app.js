@@ -4,16 +4,16 @@ const {
     DynamoDBClient, // Dynamodb instance
     ScanCommand, //Scan the table
 } = require('@aws-sdk/client-dynamodb'); //aws-sdk is used to build rest APIs,
- //client-dynamodb library used to communicate with the 
+//client-dynamodb library used to communicate with the 
 //create new instance of DynamoDBClient to db, will use this constant across the program
-const db = new DynamoDBClient(); 
+const db = new DynamoDBClient();
 //import util-dynamodb
 const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb'); // retrieve and save data
 
 //this function will get employee details based on empId
 //create function as async with event as argument
 const getEmployee = async (event) => {
-    const response = {};
+    let response = {};
     let empId;
     //try block code
     try {
@@ -26,11 +26,20 @@ const getEmployee = async (event) => {
         //await response from db when sent getItem command with params 
         //containing tablename, key and only display empId and personalInfo
         const { Item } = await db.send(new GetItemCommand(params));
-        // generate response message and body
-        response.body = JSON.stringify({
-            message: `Successfully retrieved employee with id = ${empId}`,
-            data: (Item) ? unmarshall(Item) : {},
-        });
+
+        if (Item.data === undefined) {
+            response.body = {
+                statusCode: 400
+            }
+            throw new Error(response);
+        } else {
+            // generate response message and body
+            response.body = JSON.stringify({
+                message: `Successfully retrieved employee with id = ${empId}`,
+                data: (Item) ? unmarshall(Item) : {},
+            });
+        }
+
     } // catch block to handle any errors
     catch (e) {
         console.error(e);
