@@ -13,8 +13,6 @@ const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb'); // retrieve 
 //this function will get employee details based on empId
 //create function as async with event as argument
 const getEmployee = async (event) => {
-    //initialize status code 200 OK 
-    const response = { statusCode: 200 };
     //try block code
     try {
         // define tablename and employeeId key with its value
@@ -46,8 +44,6 @@ const getEmployee = async (event) => {
 //This function is used to retrieve all employees details
 //create getAllEmployees function as async
 const getAllEmployees = async () => {
-    //initialize status code 200 OK
-    const response = { statusCode: 200 };
     //try block code - this block evaluates the employee retrieve function, if true it gives employee details
     //or if false, it catches server response error and displayes at console
     try {
