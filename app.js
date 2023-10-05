@@ -1,24 +1,22 @@
+// This program is for getting the employee details based http GET method.
 const {
-    GetItemCommand,
-    DynamoDBClient,
-    ScanCommand,
-  } = require('@aws-sdk/client-dynamodb'); //import functions from client-dynamodb library
-  //create new instance of DynamoDBClient
+    GetItemCommand, // Retrieve data fron dynamoDb table
+    DynamoDBClient, // Dynamodb instance
+    ScanCommand, //Scan the table
+} = require('@aws-sdk/client-dynamodb'); //aws-sdk is used to build rest APIs,
+ //client-dynamodb library used to communicate with the 
+//create new instance of DynamoDBClient to db, will use this constant across the program
 const db = new DynamoDBClient(); 
 //import util-dynamodb
-const { marshall, unmarshall } = require ('@aws-sdk/util-dynamodb'); 
+const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb'); // retrieve and save data
+
+//this function will get employee details based on empId
 //create function as async with event as argument
 const getEmployee = async (event) => {
     //initialize status code 200 OK 
-    const response = { statusCode: 200 };       
- /*    if(role == "EMPLOYEE"){
-        const {item } = await db.send(new GetItemCommand(params));
-        if(empId != item.empId){
-            throw new Error("Access denied!");
-        }
-    } */
+    const response = { statusCode: 200 };
     //try block code
-    try { 
+    try {
         // define tablename and employeeId key with its value
         const params = {
             TableName: process.env.DYNAMODB_TABLE_NAME,
@@ -29,16 +27,14 @@ const getEmployee = async (event) => {
         const { Item } = await db.send(new GetItemCommand(params));
         // generate response message and body
         response.body = JSON.stringify({
-            message: "Successfully retrieved employee.",
+            message: `Successfully retrieved employee with id = ${empId} `,
             data: (Item) ? unmarshall(Item) : {},
-            // rawData: Item,
         });
     } // catch block to handle any errors
     catch (e) {
         console.error(e);
-        response.statusCode = 500;
         response.body = JSON.stringify({
-            message: "Failed to get employee.",
+            message: `Failed to get employee with id = ${empId}.`,
             errorMsg: e.message,
             errorStack: e.stack,
         });
@@ -47,35 +43,30 @@ const getEmployee = async (event) => {
     return response;
 };
 
-//create getAllEmployees function as async with event as argument
-const getAllEmployees = async () => { 
-     //initialize status code 200 OK
+//This function is used to retrieve all employees details
+//create getAllEmployees function as async
+const getAllEmployees = async () => {
+    //initialize status code 200 OK
     const response = { statusCode: 200 };
-/* let adminRole = "ADMIN";
-    let hrRole = "HR";
-    if(role != adminRole || role != hrRole){
-        throw new Error("User does not have access!");
-    } */
-    //try block code
+    //try block code - this block evaluates the employee retrieve function, if true it gives employee details
+    //or if false, it catches server response error and displayes at console
     try {
         const input = {
             TableName: process.env.DYNAMODB_TABLE_NAME,
-          };
+        };
         //await response from db when sent scan command with tablename
         const { Items } = await db.send(new ScanCommand(input));
         // generate response message and body
         response.body = JSON.stringify({
             message: "Successfully retrieved all employees.",
-            data: Items.map((item) => unmarshall(item)),
-            // Items,
+            data: Items?.map((item) => unmarshall(item)),
         });
-    } 
-    // catch block to handle any errors
+    }
+    // catch block to handle any server response errors
     catch (e) {
         console.error(e);
-        response.statusCode = 500;
         response.body = JSON.stringify({
-            message: "Failed to retrieve employees.",
+            message: "Failed to retrieve all employees.",
             errorMsg: e.message,
             errorStack: e.stack,
         });
@@ -84,7 +75,7 @@ const getAllEmployees = async () => {
     return response;
 };
 
-//export functions so that it can be used elsewhere
+//exporting methods globally
 module.exports = {
     getEmployee,
     getAllEmployees,

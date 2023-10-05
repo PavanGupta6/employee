@@ -2,7 +2,7 @@
 service: employee-crud-api
 #provider details
 provider:
-#provider name
+  #provider name
   name: aws
   #runtime for the project
   runtime: nodejs18.x
@@ -12,21 +12,21 @@ provider:
   region: ap-south-1
   #environment details
   environment:
-  #Dynamodb table name - read from this file, custom header, employeeTableName key
+    #Dynamodb table name - read from this file, custom header, employeeTableName key
     DYNAMODB_TABLE_NAME: ${self:custom.employeeTableName}
 #custom section, which can be used as a variable
 custom:
-#generate table name adding suffix from provider - stage name
+  #generate table name adding suffix from provider - stage name
   employeeTableName: emp-table-${self:provider.stage}
-#plugins required 
+#plugins required
 plugins:
-# creates iam roles for each function
+  # creates iam roles for each function
   - serverless-iam-roles-per-function
 #lambda functions section
 functions:
-#function name
+  #function name
   getEmployee:
-   #starting point of the function - pointing to the function
+    #starting point of the function - pointing to the function
     handler: app.getEmployee
     #name of lambda function
     name: get-employee
@@ -36,23 +36,23 @@ functions:
     timeout: 5 # seconds
     #events for triggering the lambda function
     events:
-     #http api request
+      #http api request
       - http:
-      #path of api endpoint
+          #path of api endpoint
           path: employee/{empId}
           #http Get method
           method: GET
     #role definition for this lambda function
     iamRoleStatements:
-    #allow iam role 
+      #allow iam role
       - Effect: "Allow"
-      #allow iam role for this action  - only getItem action is allowed
+        #allow iam role for this action  - only getItem action is allowed
         Action:
           - "dynamodb:GetItem"
-           #resource of dynamodb - get attribute name from ARN of employeeTable
+            #resource of dynamodb - get attribute name from ARN of employeeTable
         Resource: !GetAtt EmployeeTable.Arn
-        
-#function name
+
+  #function name
   getAllEmployees:
     handler: app.getAllEmployees
     name: get-all-employees
@@ -60,32 +60,32 @@ functions:
     timeout: 5 # seconds
     events:
       - http:
-      #path of api endpoint
+          #path of api endpoint
           path: employees
           #http Get method
           method: GET
     iamRoleStatements:
-    #allow iam role for this action  - only table scan action is allowed
+      #allow iam role for this action  - only table scan action is allowed
       - Effect: "Allow"
         Action:
           - "dynamodb:Scan"
         Resource: !GetAtt EmployeeTable.Arn
-#resources required 
+#resources required
 resources:
   Resources:
-  #EmployeeTable section has resource details of the table 
+    #EmployeeTable section has resource details of the table
     EmployeeTable:
-    #type of aws service
+      #type of aws service
       Type: AWS::DynamoDB::Table
       #Declare the properties of the table
       Properties:
-      #Table name
+        #Table name
         TableName: ${self:custom.employeeTableName}
         #Partition key definition
         AttributeDefinitions:
-        #Partition key name
+          #Partition key name
           - AttributeName: empId
-          #Partition key type
+            #Partition key type
             AttributeType: S
             #key schema for the table
         KeySchema:
@@ -93,7 +93,7 @@ resources:
             KeyType: HASH
             # provisioned throughput for the table
         ProvisionedThroughput:
-        #read capacity per second in units
+          #read capacity per second in units
           ReadCapacityUnits: 1
           #write capacity per second in units
           WriteCapacityUnits: 1

@@ -1,20 +1,22 @@
 {
-  "name": "employee-crud-api-gateway",
+  "name": "employee",
   "version": "1.0.0",
-  "description": "Employee CRUD API using API Gateway and AWS Lambda",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
-  "keywords": [],
-  "author": "Pavan",
+  "author": "",
   "license": "ISC",
   "dependencies": {
-      "@aws-sdk/client-dynamodb": "^3.415.0",
-      "@aws-sdk/util-dynamodb": "^3.415.0",
-      "aws-sdk": "^2.1460.0"
+    "@aws-sdk/client-dynamodb": "^3.423.0",
+    "@aws-sdk/util-dynamodb": "^3.423.0",
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
-      "serverless-iam-roles-per-function": "^3.2.0"
-  }
+    "chai": "^4.3.10",
+    "lambda-tester": "^4.0.1",
+    "mocha": "^10.2.0"
+  },
+  "keywords": [],
+  "description": ""
 }
