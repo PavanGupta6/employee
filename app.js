@@ -31,9 +31,12 @@ const getEmployee = async (event) => {
               message: "Successfully retrieved employee.",
               data: unmarshall(Item)
             });
-          } else {
+          } else if(Item == {}){
             // throw an error if the item is not found
             throw new Error('Employee details not found.');
+          }
+          else {
+            throw new Error('Unexpected error occurred.');
           }
     } // catch block to handle any errors
     catch (e) {
