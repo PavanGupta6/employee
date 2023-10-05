@@ -31,10 +31,11 @@ const getEmployee = async (event) => {
             response.body = {
                 statusCode: 400
             }
-            throw new Error(response.body);
+            throw new Error(`Failed to get employee with id = ${empId}.`);
         } else {
             // generate response message and body
             response.body = JSON.stringify({
+                statusCode: 200,
                 message: `Successfully retrieved employee with id = ${empId}`,
                 data: (Item) ? unmarshall(Item) : {},
             });
@@ -44,7 +45,7 @@ const getEmployee = async (event) => {
     catch (e) {
         console.error(e);
         response.body = JSON.stringify({
-            message: `Failed to get employee with id = ${empId}.`,
+            statusCode: e.statusCode,
             errorMsg: e.message,
             errorStack: e.stack,
         });
