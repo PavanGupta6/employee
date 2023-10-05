@@ -13,6 +13,7 @@ const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb'); // retrieve 
 //this function will get employee details based on empId
 //create function as async with event as argument
 const getEmployee = async (event) => {
+    let response = {};
     
     //try block code
     try {
@@ -21,11 +22,11 @@ const getEmployee = async (event) => {
             TableName: process.env.DYNAMODB_TABLE_NAME,
             Key: marshall({ empId: event.pathParameters.empId }),
         };
+        var empId = params.Key.empId;
         //await response from db when sent getItem command with params 
         //containing tablename, key and only display empId and personalInfo
         const { Item } = await db.send(new GetItemCommand(params));
-        
-        var empId = params.Key.empId;
+
         if (Item.data === undefined) {
             response.body = {
                 statusCode: 400
