@@ -27,7 +27,7 @@ const getEmployee = async (event) => {
         //containing tablename, key and only display empId and personalInfo
         const { Item } = await db.send(new GetItemCommand(params));
 
-        if (Item.data === undefined) {
+        if (Item === undefined) {
             response.body = {
                 statusCode: 400
             }
