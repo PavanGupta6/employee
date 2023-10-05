@@ -31,7 +31,7 @@ const getEmployee = async (event) => {
             response.body = {
                 statusCode: 400
             }
-            throw new Error(response);
+            throw new Error(response.body);
         } else {
             // generate response message and body
             response.body = JSON.stringify({
