@@ -41,7 +41,7 @@ const getEmployee = async (event) => {
     } // catch block to handle any errors
     catch (e) {
         console.error(e);
-        response.status(e.message === 'Employee details not found.' ? 400 : e.statusCode || 500);
+        response.statusCode(e.message === 'Employee details not found.' ? 400 : e.statusCode || 500);
         response.body = JSON.stringify({
             statusCode : response.statusCode,
             message: "Failed to get employee.",
