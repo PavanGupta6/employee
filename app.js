@@ -25,7 +25,7 @@ const getEmployee = async (event) => {
         //Await response from db when sent GetItemCommand 
         //With params as argument containing tablename and key
         const { Item } = await db.send(new GetItemCommand(params));
-
+        console.log({ Item });
         if (Item) {
             response.body = JSON.stringify({
                 message: "Successfully retrieved employee details.",
@@ -38,6 +38,7 @@ const getEmployee = async (event) => {
             });
         }
         else {
+            response.statusCode = 500;
             throw new Error('Unexpected error occurred.');
         }
     } // Catch block to handle any errors
@@ -57,7 +58,7 @@ const getEmployee = async (event) => {
 //This function is used to retrieve all employees details
 //Create getAllEmployees function as async
 const getAllEmployees = async () => {
-    const response = {};
+    const response = { statusCode: 200};
     //Try block code - this block evaluates the employee retrieve function, if true it gives employee details
     //or if false, it catches server response error and displayes at console
     try {
@@ -69,7 +70,7 @@ const getAllEmployees = async () => {
         if (Items.length === 0) { // If employees are not present
             response.statusCode = 404; // Setting the status code to 404
             response.body = JSON.stringify({
-                message: "Employees details not found.",
+                message: "Employees details are not found.",
             });
         } else {
             // Generate response message and data
