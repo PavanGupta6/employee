@@ -17,7 +17,7 @@ provider:
 #custom section, which can be used as a variable
 custom:
 #generate table name adding suffix from provider - stage name
-  employeeTableName: emp-table-${self:provider.stage}
+  employeeTableName: emp-table-one-${self:provider.stage}
 #plugins required 
 plugins:
 # creates iam roles for each function
