@@ -1,5 +1,5 @@
 #api gateway service name
-service: employee-crud-api-one
+service: employee-crud-api
 #provider details
 provider:
 #provider name
@@ -17,7 +17,7 @@ provider:
 #custom section, which can be used as a variable
 custom:
 #generate table name adding suffix from provider - stage name
-  employeeTableName: emp-table-one-${self:provider.stage}
+  employeeTableName: emp-table-${self:provider.stage}
 #plugins required 
 plugins:
 # creates iam roles for each function
@@ -27,9 +27,9 @@ functions:
 #function name
   getEmployee:
    #starting point of the function - pointing to the function
-    handler: app.handler
+    handler: app.getEmployee
     #name of lambda function
-    name: get-employee-one
+    name: get-employee
     #default memory assigned
     memorySize: 128 # mb
     #waiting for response timeout
@@ -42,11 +42,6 @@ functions:
           path: employee/{empId}
           #http Get method
           method: GET
-      - http:
-        #path of api endpoint
-            path: employees
-            #http Get method
-            method: GET
     #role definition for this lambda function
     iamRoleStatements:
     #allow iam role 
@@ -54,28 +49,27 @@ functions:
       #allow iam role for this action  - only getItem action is allowed
         Action:
           - "dynamodb:GetItem"
-          - "dynamodb:Scan"
            #resource of dynamodb - get attribute name from ARN of employeeTable
         Resource: !GetAtt EmployeeTable.Arn
         
 #function name
-  # getAllEmployees:
-  #   handler: app.getAllEmployees
-  #   name: get-all-employees
-  #   memorySize: 128 # mb
-  #   timeout: 5 # seconds
-  #   events:
-  #     - http:
-  #     #path of api endpoint
-  #         path: employees
-  #         #http Get method
-  #         method: GET
-  #   iamRoleStatements:
-  #   #allow iam role for this action  - only table scan action is allowed
-  #     - Effect: "Allow"
-  #       Action:
-  #       - "dynamodb:Scan"
-  #      Resource: !GetAtt EmployeeTable.Arn
+  getAllEmployees:
+    handler: app.getAllEmployees
+    name: get-all-employees
+    memorySize: 128 # mb
+    timeout: 5 # seconds
+    events:
+      - http:
+      #path of api endpoint
+          path: employees
+          #http Get method
+          method: GET
+    iamRoleStatements:
+    #allow iam role for this action  - only table scan action is allowed
+      - Effect: "Allow"
+        Action:
+          - "dynamodb:Scan"
+        Resource: !GetAtt EmployeeTable.Arn
 #resources required 
 resources:
   Resources:
