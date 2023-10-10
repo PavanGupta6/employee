@@ -14,12 +14,10 @@ const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb'); // Retrieve 
 module.exports.getEmployee = async (event) => {
     //Initialize status code 200 OK 
     const response = { statusCode: 200 };
-    console.log(`event - ${event}`);
-    console.log(`event path - ${event.path}`);
+    console.log('event data in request - ', event)
     const empId = event.pathParameters.empId;
-    console.log(`empId - ${empId}`);
-    switch (event.path) {
-        case `/employee/${empId}`:
+    switch (event.resource) {
+        case '/employee/{empId}':
             //Try block code - this block evaluates the employee retrieve function based on empId,
             // If true it gives employee details or it catches server response error and displayes at console
             try {
@@ -34,25 +32,25 @@ module.exports.getEmployee = async (event) => {
                 console.log({ Item });
                 if (Item) {  //If item is present then send details
                     response.body = JSON.stringify({
-                        message: "Successfully retrieved employee details.",
+                        message: `Successfully retrieved employee details of empId : ${empId}.`,
                         data: unmarshall(Item)
                     });
                 } else if (Item === undefined) { //If Item is not found then send 404 error
                     response.statusCode = 404;
                     response.body = JSON.stringify({
-                        message: 'Employee details not found.'
+                        message: `Employee details not found for empId : ${empId}.`
                     });
                 }
                 else {
                     response.statusCode = 500;
-                    throw new Error('Unexpected error occurred.');
+                    throw new Error(`Unexpected error occurred while fetching empId : ${empId}.`);
                 }
             } // Catch block to handle any errors
             catch (e) {
                 console.error(e);
                 response.body = JSON.stringify({
                     statusCode: response.statusCode,
-                    message: "Failed to get employee details.",
+                    message: `Failed to get employee details with empId : ${empId}.`,
                     errorMsg: e.message,
                     errorStack: e.stack,
                 });
