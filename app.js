@@ -15,9 +15,9 @@ module.exports.getEmployee = async (event) => {
     //Initialize status code 200 OK 
     const response = { statusCode: 200 };
     console.log('event data in request - ', event)
-    const empId = event.pathParameters.empId;
     switch (event.resource) {
         case '/employee/{empId}':
+            const empId = event.pathParameters.empId;
             //Try block code - this block evaluates the employee retrieve function based on empId,
             // If true it gives employee details or it catches server response error and displayes at console
             try {
