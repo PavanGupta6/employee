@@ -36,12 +36,20 @@ functions:
     timeout: 5 # seconds
     #events for triggering the lambda function
     events:
-     #http api request
+     #http api get request to Get employee by ID
       - http:
       #path of api endpoint
           path: employee/{empId}
           #http Get method
           method: GET
+          cors: true
+      #http api get request to Get all employees
+      - http:
+      #path of api endpoint
+          path: employees
+          #http Get method
+          method: GET
+          cors: true
     #role definition for this lambda function
     iamRoleStatements:
     #allow iam role 
@@ -49,27 +57,10 @@ functions:
       #allow iam role for this action  - only getItem action is allowed
         Action:
           - "dynamodb:GetItem"
+          - "dynamodb:Scan"
            #resource of dynamodb - get attribute name from ARN of employeeTable
         Resource: !GetAtt EmployeeTable.Arn
         
-#function name
-  getAllEmployees:
-    handler: app.getAllEmployees
-    name: get-all-employees
-    memorySize: 128 # mb
-    timeout: 5 # seconds
-    events:
-      - http:
-      #path of api endpoint
-          path: employees
-          #http Get method
-          method: GET
-    iamRoleStatements:
-    #allow iam role for this action  - only table scan action is allowed
-      - Effect: "Allow"
-        Action:
-          - "dynamodb:Scan"
-        Resource: !GetAtt EmployeeTable.Arn
 #resources required 
 resources:
   Resources:
