@@ -15,8 +15,8 @@ module.exports.getEmployee = async (event) => {
     //Initialize status code 200 OK 
     const response = { statusCode: 200 };
     console.log('event data in request - ', event.resource, event.path, event.headers.Accept, event.httpMethod, event.body)
-    switch (event.resource) {
-        case '/employee/{empId}':
+    switch (`${event.resource} ${event.httpMethod}`) {
+        case '/employee/{empId} GET':
             const empId = event.pathParameters.empId;
             //Try block code - this block evaluates the employee retrieve function based on empId,
             // If true it gives employee details or it catches server response error and displayes at console
@@ -56,7 +56,7 @@ module.exports.getEmployee = async (event) => {
             }
             break;
 
-        case '/employees':
+        case '/employees GET':
             try {
                 const input = {
                     TableName: process.env.DYNAMODB_TABLE_NAME,
