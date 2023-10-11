@@ -14,7 +14,7 @@ const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb'); // Retrieve 
 module.exports.getEmployee = async (event) => {
     //Initialize status code 200 OK 
     const response = { statusCode: 200 };
-    console.log('event data in request - ', event)
+    console.log('event data in request - ', event.resource, event.path, event.headers.Accept, event.httpMethod, event.body)
     switch (event.resource) {
         case '/employee/{empId}':
             const empId = event.pathParameters.empId;
@@ -29,7 +29,6 @@ module.exports.getEmployee = async (event) => {
                 //Await response from db when sent GetItemCommand 
                 //With params as argument containing tablename and key
                 const { Item } = await db.send(new GetItemCommand(params));
-                console.log({ Item });
                 if (Item) {  //If item is present then send details
                     response.body = JSON.stringify({
                         message: `Successfully retrieved employee details of empId : ${empId}.`,
@@ -55,8 +54,7 @@ module.exports.getEmployee = async (event) => {
                     errorStack: e.stack,
                 });
             }
-            //Return response with statusCode and data.
-            return response;
+            break;
 
         case '/employees':
             try {
@@ -87,7 +85,14 @@ module.exports.getEmployee = async (event) => {
                     errorStack: e.stack,
                 });
             }
-            //Return response with statusCode and data. 
-            return response;
+            break;
+
+        default:
+            response.statusCode = 404;
+            response.body = JSON.stringify({
+                message: `URL not found -  ${event.resource}`,
+            })
     };
+    //Return response with statusCode and data.
+    return response;
 }
