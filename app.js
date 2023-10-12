@@ -25,6 +25,7 @@ module.exports.getEmployee = async (event) => {
                 const params = {
                     TableName: process.env.DYNAMODB_TABLE_NAME,
                     Key: marshall({ empId: empId }),
+                    ProjectionExpression: "empId, personalInfo",
                 };
                 //Await response from db when sent GetItemCommand 
                 //With params as argument containing tablename and key
@@ -60,6 +61,7 @@ module.exports.getEmployee = async (event) => {
             try {
                 const input = {
                     TableName: process.env.DYNAMODB_TABLE_NAME,
+                    ProjectionExpression: "empId, personalInfo",
                 };
                 //Await response from db when sent scan command with tablename
                 const { Items } = await db.send(new ScanCommand(input));
