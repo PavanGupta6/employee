@@ -38,17 +38,23 @@ functions:
     events:
      #http api get request to Get employee by ID
       - http:
-      #path of api endpoint
+      #path of GET api endpoint
           path: employee/{empId}
           #http Get method
           method: GET
           cors: true
       #http api get request to Get all employees
       - http:
-      #path of api endpoint
+      #path of GET api endpoint
           path: employees
           #http Get method
           method: GET
+          cors: true
+      - http:
+      #path of delete api endpoint
+          path: performanceInfo/{empId}
+          #http Get method
+          method: DELETE
           cors: true
     #role definition for this lambda function
     iamRoleStatements:
@@ -58,6 +64,7 @@ functions:
         Action:
           - "dynamodb:GetItem"
           - "dynamodb:Scan"
+          - "dynamodb:UpdateItem"
            #resource of dynamodb - get attribute name from ARN of employeeTable
         Resource: !GetAtt EmployeeTable.Arn
         

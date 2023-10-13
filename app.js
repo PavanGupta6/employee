@@ -2,7 +2,8 @@
 const {
     GetItemCommand, // Retrieve data fron dynamoDb table
     DynamoDBClient, // Dynamodb instance
-    ScanCommand, //Scan the table
+    ScanCommand,  //Scan the table
+    UpdateItemCommand, 
 } = require('@aws-sdk/client-dynamodb'); //aws-sdk is used to build rest APIs,
 //client-dynamodb library used to communicate with the
 //Create new instance of DynamoDBClient to db, will use this constant across the program
@@ -14,10 +15,11 @@ const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb'); // Retrieve 
 module.exports.getEmployee = async (event) => {
     //Initialize status code 200 OK 
     const response = { statusCode: 200 };
-    console.log('event data in request - ', event.resource, event.path, event.headers.Accept, event.httpMethod, event.body)
+    console.log('event data in request - ', event.resource, event.path, event.headers.Accept, event.httpMethod, event.body);
+    let empId;
     switch (`${event.resource} ${event.httpMethod}`) {
         case '/employee/{empId} GET':
-            const empId = event.pathParameters.empId;
+            empId = event.pathParameters.empId;
             //Try block code - this block evaluates the employee retrieve function based on empId,
             // If true it gives employee details or it catches server response error and displayes at console
             try {
@@ -83,6 +85,34 @@ module.exports.getEmployee = async (event) => {
                 console.error(e);
                 response.body = JSON.stringify({
                     message: "Failed to retrieve all employees.",
+                    errorMsg: e.message,
+                    errorStack: e.stack,
+                });
+            }
+            break;
+
+        case '/performanceInfo/{empId} DELETE':
+            empId = event.pathParameters.empId;
+            try {
+                const deleteInput = {
+                    TableName: process.env.DYNAMODB_TABLE_NAME,
+                    Key: marshall({ empId: empId }),
+                    ConditionExpression: 'attribute_exists(empId)',
+                    UpdateExpression: "REMOVE performanceInfo"
+                };
+                //Await response from db when sent update Item command with required inputs
+                await db.send(new UpdateItemCommand(deleteInput));
+                // Generate response message and data
+                response.body = JSON.stringify({
+                    message: `Successfully deleted performance Information details of empId : ${empId}.`
+                });
+            }
+            // Catch block to handle any server response errors
+            catch (e) {
+                console.error(e);
+                response.body = JSON.stringify({
+                    message: `Failed to delete employee performance Information details
+                    .021 with empId : ${empId}.`,
                     errorMsg: e.message,
                     errorStack: e.stack,
                 });
