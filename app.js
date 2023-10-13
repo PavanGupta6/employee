@@ -3,7 +3,7 @@ const {
     GetItemCommand, // Retrieve data fron dynamoDb table
     DynamoDBClient, // Dynamodb instance
     ScanCommand,  //Scan the table
-    UpdateItemCommand, 
+    UpdateItemCommand,
 } = require('@aws-sdk/client-dynamodb'); //aws-sdk is used to build rest APIs,
 //client-dynamodb library used to communicate with the
 //Create new instance of DynamoDBClient to db, will use this constant across the program
@@ -111,8 +111,45 @@ module.exports.getEmployee = async (event) => {
             catch (e) {
                 console.error(e);
                 response.body = JSON.stringify({
-                    message: `Failed to delete employee performance Information details
-                    .021 with empId : ${empId}.`,
+                    message: `Failed to delete employee performance Information details with empId : ${empId}.`,
+                    errorMsg: e.message,
+                    errorStack: e.stack,
+                });
+            }
+            break;
+
+        case 'softdel/performanceInfo/{empId} DELETE':
+            empId = event.pathParameters.empId;
+            const isActiveStatus = event.performanceInfo.isActive;
+            if (!(typeof isActiveStatus === Boolean)) { throw new Error('isActive attribute should be of boolean type!') };
+            try {
+                const softDeleteInput = {
+                    TableName: process.env.DYNAMODB_TABLE_NAME,
+                    Key: marshall({ empId: empId }),
+                    ConditionExpression: 'attribute_exists(empId)',
+                    UpdateExpression: 'SET isActive = :isActive',
+                    ExpressionAttributeValues: marshall({
+                        ':isActive': isActiveStatus,
+                    })
+                };
+                //Await response from db when sent update Item command with required inputs
+                await db.send(new UpdateItemCommand(softDeleteInput));
+                // Generate response message and data
+                if (isActiveStatus === false){ 
+                    response.body = JSON.stringify({
+                        message: `Successfully soft deleted performance Information details of empId : ${empId}.`
+                    });
+                } else {
+                    response.body = JSON.stringify({
+                        message: `Successfully RESTORED soft deleted performance Information details of empId : ${empId}.`
+                    });
+                }
+            }
+            // Catch block to handle any server response errors
+            catch (e) {
+                console.error(e);
+                response.body = JSON.stringify({
+                    message: `Failed to soft delete employee performance Information details with empId : ${empId}.`,
                     errorMsg: e.message,
                     errorStack: e.stack,
                 });
