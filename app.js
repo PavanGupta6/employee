@@ -120,7 +120,7 @@ module.exports.getEmployee = async (event) => {
 
         case '/softdel/performanceInfo/{empId} DELETE':
             empId = event.pathParameters.empId;
-            const isActiveStatus = event.performanceInfo.isActive;
+            const isActiveStatus = event.body.performanceInfo.isActive;
             if (!(typeof isActiveStatus === Boolean)) { throw new Error('isActive attribute should be of boolean type!') };
             try {
                 const softDeleteInput = {
@@ -135,7 +135,7 @@ module.exports.getEmployee = async (event) => {
                 //Await response from db when sent update Item command with required inputs
                 await db.send(new UpdateItemCommand(softDeleteInput));
                 // Generate response message and data
-                if (isActiveStatus === false){ 
+                if (isActiveStatus === false) {
                     response.body = JSON.stringify({
                         message: `Successfully soft deleted performance Information details of empId : ${empId}.`
                     });
