@@ -122,6 +122,7 @@ module.exports.getEmployee = async (event) => {
             empId = event.pathParameters.empId;
             console.log('event',event);
             const isActiveStatus = event.body.performanceInfo?.isActive;
+            console.log('isActiveStatus',isActiveStatus);
             if (typeof isActiveStatus != Boolean) { throw new Error('isActive attribute should be of boolean type!') };
             try {
                 const softDeleteInput = {
