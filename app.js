@@ -120,8 +120,9 @@ module.exports.getEmployee = async (event) => {
 
         case '/softdel/performanceInfo/{empId} DELETE':
             empId = event.pathParameters.empId;
-            const isActiveStatus = event.body.performanceInfo.isActive;
-            if (!(typeof isActiveStatus === Boolean)) { throw new Error('isActive attribute should be of boolean type!') };
+            console.log('event',event);
+            const isActiveStatus = event.body.performanceInfo?.isActive;
+            if (typeof isActiveStatus != Boolean) { throw new Error('isActive attribute should be of boolean type!') };
             try {
                 const softDeleteInput = {
                     TableName: process.env.DYNAMODB_TABLE_NAME,
