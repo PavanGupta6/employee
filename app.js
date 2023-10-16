@@ -121,7 +121,7 @@ module.exports.getEmployee = async (event) => {
         case '/softdel/performanceInfo/{empId} DELETE':
             empId = event.pathParameters.empId;
             console.log('event',event);
-            const isActiveStatus = event.body.performanceInfo?.isActive;
+            const isActiveStatus = (event && event.body && event.body.performanceInfo && event.body.performanceInfo.isActive);
             console.log('isActiveStatus',isActiveStatus);
             if (typeof isActiveStatus != Boolean) { throw new Error('isActive attribute should be of boolean type!') };
             try {
