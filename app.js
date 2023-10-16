@@ -123,7 +123,7 @@ module.exports.getEmployee = async (event) => {
             const body = JSON.parse(event.body);
             const isActiveStatus = body.performanceInfo?.isActive;
             console.log('isActiveStatus',isActiveStatus);
-            if (typeof isActiveStatus != Boolean) { throw new Error('isActive attribute should be of boolean type!') };
+            if (typeof isActiveStatus !== "boolean") { throw new Error('isActive attribute should be of boolean type!') };
             try {
                 const softDeleteInput = {
                     TableName: process.env.DYNAMODB_TABLE_NAME,
