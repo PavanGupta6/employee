@@ -130,7 +130,7 @@ module.exports.getEmployee = async (event) => {
             empId = event.pathParameters.empId;
             const body = JSON.parse(event.body);
             const isActiveStatus = body.performanceInfo?.isActive;
-            console.log('isActiveStatus', isActiveStatus);
+            console.log('isActive Status will be set to - ', isActiveStatus);
             if (typeof isActiveStatus !== "boolean") { throw new Error('isActive attribute should be of boolean type!') };
             try {
                 const softDeleteInput = {
@@ -158,11 +158,19 @@ module.exports.getEmployee = async (event) => {
             // Catch block to handle any server response errors
             catch (e) {
                 console.error(e);
-                response.body = JSON.stringify({
-                    message: `Failed to soft delete employee performance Information details with empId : ${empId}.`,
-                    errorMsg: e.message,
-                    errorStack: e.stack,
-                });
+                if (e.name === "ConditionalCheckFailedException") {
+                    response.statusCode = 400;
+                    response.body = JSON.stringify({
+                        message: `Employee Details not found for empId : ${empId}.`,
+                        errorMsg: e.message,
+                    });
+                } else {
+                    response.body = JSON.stringify({
+                        message: `Failed to soft delete employee performance Information details with empId : ${empId}.`,
+                        errorMsg: e.message,
+                        errorStack: e.stack,
+                    });
+                }
             }
             break;
 
