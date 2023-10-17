@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { getEmployee, getAllEmployees } = require('./app');
+const { getEmployee } = require('./app');
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { marshall } = require("@aws-sdk/util-dynamodb");
 
@@ -42,36 +42,36 @@ describe('get employee by empId unit tests', () => {
         const responseBody = JSON.parse(response.body);
         expect(responseBody.message).to.equal(
             `Successfully retrieved employee details of empId : ${empId}.`
-            );
-        });
-        
-        //invalid empId test case
-        it('Employee details not found error for invalid empId', async () => {
-            // Create a mock send function that returns an empty response
-            DynamoDBClient.prototype.send = async function () {
-                return {};
-            };
-            //invalid empId
-            const event = {
-                headers: {
-                    Accept: '*/*',
-                },
-                body: {},
-                resource: '/employee/{empId}',
-                path: '/employee/10',
-                httpMethod: 'GET',
-                pathParameters: {
-                    empId: '10',
-                },
-            };
-            const empId = event.pathParameters.empId;
-            // calling the getEmployee from the app.js file
-            const response = await getEmployee(event);
+        );
+    });
+
+    //invalid empId test case
+    it('Employee details not found error for invalid empId', async () => {
+        // Create a mock send function that returns an empty response
+        DynamoDBClient.prototype.send = async function () {
+            return {};
+        };
+        //invalid empId
+        const event = {
+            headers: {
+                Accept: '*/*',
+            },
+            body: {},
+            resource: '/employee/{empId}',
+            path: '/employee/10',
+            httpMethod: 'GET',
+            pathParameters: {
+                empId: '10',
+            },
+        };
+        const empId = event.pathParameters.empId;
+        // calling the getEmployee from the app.js file
+        const response = await getEmployee(event);
         expect(response.statusCode).to.equal(404);
         const responseBody = JSON.parse(response.body);
         expect(responseBody.message).to.equal(
             `Employee details not found for empId : ${empId}.`
-            );
+        );
     });
 
     //unexpected error test case for get by empID
@@ -198,7 +198,7 @@ describe('get employee by empId unit tests', () => {
     //wrong endpoint test
     describe('wrong endpoint test', () => {
         it('Should get 404 error If wrogn endpoint is present', async () => {
-                const event = {
+            const event = {
                 headers: {
                     Accept: '*/*',
                 },
@@ -219,4 +219,47 @@ describe('get employee by empId unit tests', () => {
         });
     });
 
+    describe('Delete employee performance details unit tests', () => {
+        let originalDynamoDBClient;
+
+        before(() => {
+            // Store the original send method
+            originalDynamoDBClient = DynamoDBClient.prototype.send;
+        });
+
+        after(() => {
+            // Restore the original send method after all tests
+            DynamoDBClient.prototype.send = originalDynamoDBClient;
+        });
+
+        //valid empId test case
+        it(`Delete employee performance details for valid empId`, async () => {
+            // Mock event object
+            DynamoDBClient.prototype.send = async function () {
+                // Create a mock send function that returns mock data
+                const mockItem = { empId: "1006" };
+                return { Item: marshall(mockItem) };
+            };
+            const event = {
+                headers: {
+                    Accept: '*/*',
+                },
+                body: {},
+                resource: '/performanceInfo/{empId}',
+                path: '/performanceInfo/1006',
+                httpMethod: 'DELETE',
+                pathParameters: {
+                    empId: '1006',
+                },
+            };
+            const empId = event.pathParameters.empId;
+            // calling the getEmployee from the app.js file
+            const response = await getEmployee(event);
+            expect(response.statusCode).to.be.equals(200);
+            const responseBody = JSON.parse(response.body);
+            expect(responseBody.message).to.equal(
+                `Successfully deleted performance Information details of empId : ${empId}.`
+            );
+        });
+    });
 });

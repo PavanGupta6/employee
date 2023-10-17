@@ -137,7 +137,7 @@ module.exports.getEmployee = async (event) => {
                     TableName: process.env.DYNAMODB_TABLE_NAME,
                     Key: marshall({ empId: empId }),
                     ConditionExpression: 'attribute_exists(empId)',
-                    UpdateExpression: 'SET isActive = :isActive',
+                    UpdateExpression: 'SET performanceInfo.isActive = :isActive',
                     ExpressionAttributeValues: marshall({
                         ':isActive': isActiveStatus,
                     })
