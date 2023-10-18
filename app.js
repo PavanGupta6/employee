@@ -101,11 +101,18 @@ module.exports.getEmployee = async (event) => {
                     UpdateExpression: "REMOVE performanceInfo"
                 };
                 //Await response from db when sent update Item command with required inputs
-                await db.send(new UpdateItemCommand(deleteInput));
+                const updatedResult = await db.send(new UpdateItemCommand(deleteInput));
+                const item = unmarshall(updatedResult);
                 // Generate response message and data
-                response.body = JSON.stringify({
-                    message: `Successfully deleted performance Information details of empId : ${empId}.`
-                });
+                if(item.performanceInfo.isActive === false){
+                    response.body = JSON.stringify({
+                        message: `Successfully deleted performance Information details of empId : ${empId}.`
+                    });
+                }
+                else{
+                    response.statusCode = 500; // Setting the status code to 500
+                    throw new Error(`Error occurred while deleting performance Information details of empId : ${empId}.`);
+                }
             }
             // Catch block to handle any server response errors
             catch (e) {
@@ -143,16 +150,20 @@ module.exports.getEmployee = async (event) => {
                     })
                 };
                 //Await response from db when sent update Item command with required inputs
-                await db.send(new UpdateItemCommand(softDeleteInput));
+                const updatedResult = await db.send(new UpdateItemCommand(softDeleteInput));
+                const item = unmarshall(updatedResult);
                 // Generate response message and data
-                if (isActiveStatus === false) {
+                if(isActiveStatus === false && item.performanceInfo.isActive === false) {
                     response.body = JSON.stringify({
                         message: `Successfully soft deleted performance Information details of empId : ${empId}.`
                     });
-                } else {
+                } else if(isActiveStatus === true && item.performanceInfo.isActive === true) {
                     response.body = JSON.stringify({
                         message: `Successfully RESTORED soft deleted performance Information details of empId : ${empId}.`
                     });
+                }
+                else {
+                    throw new Error(`Error occurred while soft deleting performance Information details of empId : ${empId}.`);
                 }
             }
             // Catch block to handle any server response errors
