@@ -101,10 +101,10 @@ module.exports.getEmployee = async (event) => {
                     UpdateExpression: "REMOVE performanceInfo"
                 };
                 //Await response from db when sent update Item command with required inputs
-                const updatedResult = await db.send(new UpdateItemCommand(deleteInput));
-                const item = { data: unmarshall(updatedResult) }
+                const {updatedResult} = await db.send(new UpdateItemCommand(deleteInput));
+                const item = { itemData: unmarshall(updatedResult) }
                 // Generate response message and data
-                if (item.data.performanceInfo.isActive === false) {
+                if (item.itemData.performanceInfo.isActive === false) {
                     response.body = JSON.stringify({
                         message: `Successfully deleted performance Information details of empId : ${empId}.`
                     });
@@ -147,17 +147,19 @@ module.exports.getEmployee = async (event) => {
                     UpdateExpression: 'SET performanceInfo.isActive = :isActive',
                     ExpressionAttributeValues: marshall({
                         ':isActive': isActiveStatus,
-                    })
+                    }),
+                    ReturnValues: "UPDATED_NEW",
                 };
                 //Await response from db when sent update Item command with required inputs
-                const updatedResult = await db.send(new UpdateItemCommand(softDeleteInput));
-                const item = { data: unmarshall(updatedResult) }
+                const {updatedResult} = await db.send(new UpdateItemCommand(softDeleteInput));
+                console.log('updatedResult = ', updatedResult);
+                const item = { itemData: unmarshall(updatedResult) }
                 // Generate response message and data
-                if (isActiveStatus === false && item.data.performanceInfo.isActive === false) {
+                if (isActiveStatus === false && item.itemData.performanceInfo.isActive === false) {
                     response.body = JSON.stringify({
                         message: `Successfully soft deleted performance Information details of empId : ${empId}.`
                     });
-                } else if (isActiveStatus === true && item.data.performanceInfo.isActive === true) {
+                } else if (isActiveStatus === true && item.itemData.performanceInfo.isActive === true) {
                     response.body = JSON.stringify({
                         message: `Successfully RESTORED soft deleted performance Information details of empId : ${empId}.`
                     });
