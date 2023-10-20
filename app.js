@@ -102,6 +102,7 @@ module.exports.getEmployee = async (event) => {
                 };
                 //Await response from db when sent update Item command with required inputs
                 const data= await db.send(new UpdateItemCommand(deleteInput));
+                console.log(data);
                 // Generate response message and data
                 if (data.$metadata.httpStatusCode === 200) {
                     response.body = JSON.stringify({
