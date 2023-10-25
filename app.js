@@ -135,8 +135,7 @@ module.exports.getEmployee = async (event) => {
         case '/softdel/performanceInfo/{empId} DELETE':
             empId = event.pathParameters.empId;
             try {
-                const strBody = JSON.stringify(event.body);
-                const body = JSON.parse(strBody);
+                const body = JSON.parse(event.body);
                 const isActiveStatus = body.performanceInfo.isActive;
                 console.log('isActive Status will be set to - ', isActiveStatus);
                 if (typeof isActiveStatus !== "boolean") {
