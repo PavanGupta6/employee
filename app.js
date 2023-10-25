@@ -102,7 +102,6 @@ module.exports.getEmployee = async (event) => {
                 };
                 //Await response from db when sent update Item command with required inputs
                 const data= await db.send(new UpdateItemCommand(deleteInput));
-                console.log(data);
                 // Generate response message and data
                 if (data.$metadata.httpStatusCode === 200) {
                     response.body = JSON.stringify({
@@ -110,7 +109,7 @@ module.exports.getEmployee = async (event) => {
                     });
                 }
                 else {
-                    response.statusCode = 500; // Setting the status code to 500
+                    response.statusCode = data.$metadata.httpStatusCode; // Setting the server response status code
                     throw new Error(`Error occurred while deleting performance Information details of empId : ${empId}.`);
                 }
             }
@@ -118,7 +117,7 @@ module.exports.getEmployee = async (event) => {
             catch (e) {
                 console.error(e);
                 if (e.name === "ConditionalCheckFailedException") {
-                    response.statusCode = 400;
+                    response.statusCode = 400; // Setting the server response status code to 400
                     response.body = JSON.stringify({
                         message: `Employee Details not found for empId : ${empId}.`,
                         errorMsg: e.message,
@@ -135,7 +134,7 @@ module.exports.getEmployee = async (event) => {
 
         case '/softdel/performanceInfo/{empId} DELETE':
             empId = event.pathParameters.empId;
-            const body = JSON.parse(event.body);
+            const body = event.body;
             const isActiveStatus = body.performanceInfo?.isActive;
             console.log('isActive Status will be set to - ', isActiveStatus);
             if (typeof isActiveStatus !== "boolean") { throw new Error('isActive attribute should be of boolean type!') };
@@ -162,7 +161,8 @@ module.exports.getEmployee = async (event) => {
                     });
                 }
                 else {
-                    throw new Error(`Error occurred while soft deleting performance Information details of empId : ${empId}.`);
+                    response.statusCode = data.$metadata.httpStatusCode;
+                    throw new Error(`Error occurred while soft deleting performance Information details from DB of empId : ${empId}.`);
                 }
             }
             // Catch block to handle any server response errors
