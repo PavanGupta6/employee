@@ -101,7 +101,7 @@ module.exports.getEmployee = async (event) => {
                     UpdateExpression: "REMOVE performanceInfo"
                 };
                 //Await response from db when sent update Item command with required inputs
-                const data= await db.send(new UpdateItemCommand(deleteInput));
+                const data = await db.send(new UpdateItemCommand(deleteInput));
                 // Generate response message and data
                 if (data.$metadata.httpStatusCode === 200) {
                     response.body = JSON.stringify({
@@ -134,11 +134,14 @@ module.exports.getEmployee = async (event) => {
 
         case '/softdel/performanceInfo/{empId} DELETE':
             empId = event.pathParameters.empId;
-            const body = event.body;
-            const isActiveStatus = body.performanceInfo?.isActive;
-            console.log('isActive Status will be set to - ', isActiveStatus);
-            if (typeof isActiveStatus !== "boolean") { throw new Error('isActive attribute should be of boolean type!') };
             try {
+                const body = event.body;
+                const isActiveStatus = body.performanceInfo?.isActive;
+                console.log('isActive Status will be set to - ', isActiveStatus);
+                if (typeof isActiveStatus !== "boolean") {
+                    response.statusCode = 400;
+                    throw new Error('isActive attribute should be of boolean type!')
+                };
                 const softDeleteInput = {
                     TableName: process.env.DYNAMODB_TABLE_NAME,
                     Key: marshall({ empId: empId }),

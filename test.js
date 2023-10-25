@@ -275,10 +275,10 @@ describe('Delete employee performance details unit tests', () => {
             },
             body: {},
             resource: '/performanceInfo/{empId}',
-            path: '/performanceInfo/1006',
+            path: '/performanceInfo/1004',
             httpMethod: 'DELETE',
             pathParameters: {
-                empId: '1006',
+                empId: '1004',
             },
         };
         const empId = event.pathParameters.empId;
@@ -434,10 +434,10 @@ describe('Soft Delete employee performance details unit tests', () => {
                 }
             },
             resource: '/softdel/performanceInfo/{empId}',
-            path: '/softdel/performanceInfo/1006',
+            path: '/softdel/performanceInfo/1008',
             httpMethod: 'DELETE',
             pathParameters: {
-                empId: '1006',
+                empId: '1008',
             },
         };
         const empId = event.pathParameters.empId;
@@ -467,7 +467,7 @@ describe('Soft Delete employee performance details unit tests', () => {
             path: '/softdel/performanceInfo/1006',
             httpMethod: 'DELETE',
             pathParameters: {
-                empId: '1006',
+                empId: '1004',
             },
         };
         const empId = event.pathParameters.empId;
@@ -509,6 +509,33 @@ describe('Soft Delete employee performance details unit tests', () => {
         const responseBody = JSON.parse(response.body);
         expect(responseBody.message).to.equal(
             `Employee Details not found for empId : ${empId}.`
+        );
+    });
+
+    it(`If isActive status is not boolean value for Soft deleting employee performance details`, async () => {
+        const event = {
+            headers: {
+                Accept: '*/*',
+            },
+            body: {
+                "performanceInfo": {
+                    "isActive": 123
+                }
+            },
+            resource: '/softdel/performanceInfo/{empId}',
+            path: '/softdel/performanceInfo/1005',
+            httpMethod: 'DELETE',
+            pathParameters: {
+                empId: '1005',
+            },
+        };
+        const empId = event.pathParameters.empId;
+        // calling the getEmployee from the app.js file
+        const response = await getEmployee(event);
+        expect(response.statusCode).to.be.equals(400);
+        const responseBody = JSON.parse(response.body);
+        expect(responseBody.errorMsg).to.equal(
+            `isActive attribute should be of boolean type!`
         );
     });
 });
